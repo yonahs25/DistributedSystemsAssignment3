@@ -29,11 +29,8 @@ import java.util.HashSet;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-/**
- * Created by asafchelouche on 26/7/16.
- */
 // Phase 1: Find all shortest dependency paths between nouns in a sentence.
-public class Phase1 {
+public class job1 {
     public static class Mapper1 extends Mapper<LongWritable, Text, Text, Text> {
         @Override
         public void setup(Context context) throws IOException, InterruptedException {
@@ -63,12 +60,12 @@ public class Phase1 {
                 // explore its children nodes recursively and add their dependency path
                 // components to the accumulated path
                 for (Node childNode : currentNode.getChildren()) {
-                    searchDependencyPath(childNode, currentNode.getDepencdencyPathComponent(), currentNode, context);
+                    searchDependencyPath(childNode, currentNode.getDependencyPathComponent(), currentNode, context);
                 }
             } else if (currentNode.isNoun()) {
                 // If the current node is a noun and we have accumulated a path so far,
                 // construct the final path string and write it to the context
-                String finalPathString = accumulatedPath + ":" + currentNode.getDepencdencyPathComponent();
+                String finalPathString = accumulatedPath + ":" + currentNode.getDependencyPathComponent();
                 Text pathText = new Text(finalPathString);
                 Text biarcText = new Text(pathStartNode.getStemmedWord() + "$" + currentNode.getStemmedWord());
                 context.write(pathText, biarcText);
@@ -80,7 +77,7 @@ public class Phase1 {
                 // explore its children nodes recursively and add their dependency path
                 // components to the accumulated path
                 for (Node childNode : currentNode.getChildren()) {
-                    searchDependencyPath(childNode, accumulatedPath + ":" + currentNode.getDepencdencyPathComponent(), pathStartNode, context);
+                    searchDependencyPath(childNode, accumulatedPath + ":" + currentNode.getDependencyPathComponent(), pathStartNode, context);
                 }
             }
         }
@@ -249,7 +246,7 @@ public class Phase1 {
         conf.set("LOCAL_OR_EMR", String.valueOf(args[3].equals("local")));
         conf.set("DPMIN", args[2]);
         Job job = Job.getInstance(conf, "Phase 1");
-        job.setJarByClass(Phase1.class);
+        job.setJarByClass(job1.class);
         job.setMapperClass(Mapper1.class);
         job.setReducerClass(Reducer1.class);
         job.setMapOutputKeyClass(Text.class);
