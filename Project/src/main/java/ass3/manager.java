@@ -33,16 +33,33 @@ public class manager {
         return path;
     }
 
-    private static String phase1_setter(Job job, String input_path) 
+    private static String job1_setter(Job job, String input_path) throws IOException ,   ClassNotFoundException, InterruptedException
     {
+        job.setJarByClass(job1.class);
+        job.setMapperClass(job1.Mapper1.class);
+        job.setReducerClass(job1.Reducer1.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
 
-        return "";
+        return set_input_output_path_for_job(job, input_path);
     }
 
-    private static String phase2_setter(Job job, String input_path)
+    private static String job2_setter(Job job, String input_path, String output_bucket) throws IOException ,   ClassNotFoundException, InterruptedException
     {
-
-        return "";
+        job.setJarByClass(job2.class);
+        job.setMapperClass(job2.Mapper2.class);
+        job.setReducerClass(job2.Reducer2.class);
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(LongPairWritable.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+        // job.setNumReduceTasks(1);
+        FileInputFormat.addInputPath(job, new Path(input_path));
+        String path = output_bucket + job.getJobName();
+        FileOutputFormat.setOutputPath(job, new Path(path));
+        return path;
     }
 
     
@@ -54,25 +71,24 @@ public class manager {
         String DPmin = args[2];
 
 
-        Configuration phase1_conf = new Configuration();
-        phase1_conf.set("DPMIN", DPmin);
-        final Job phase1_job = Job.getInstance(phase1_conf, "phase1");
-        String phase1_path = phase1_setter(phase1_job, input_bucket);
-        if (phase1_job.waitForCompletion(true)) {
-            System.out.println("phase 1 finished");
+        Configuration job1_conf = new Configuration();
+        job1_conf.set("DPMIN", DPmin);
+        final Job job1_job = Job.getInstance(job1_conf, "job1");
+        String job1_path = job1_setter(job1_job, input_bucket);
+        if (job1_job.waitForCompletion(true)) {
+            System.out.println("job 1 finished");
         } else {
-            System.out.println("phase1 failed");
+            System.out.println("job1 failed");
             System.exit(1);
         }
 
-        Configuration phase2_conf = new Configuration();
-        phase1_conf.set("DPMIN", DPmin);
-        final Job phase2_job = Job.getInstance(phase2_conf, "phase1");
-        String phase2_path = phase1_setter(phase2_job, input_bucket);
-        if (phase1_job.waitForCompletion(true)) {
-            System.out.println("phase 2 finished");
+        Configuration job2_conf = new Configuration();
+        final Job job2_job = Job.getInstance(job2_conf, "job2");
+        String job2_path = job2_setter(job2_job, job1_path, output_bucket);
+        if (job2_job.waitForCompletion(true)) {
+            System.out.println("job 2 finished");
         } else {
-            System.out.println("phase 2 failed");
+            System.out.println("job 2 failed");
             System.exit(1);
         }
 
