@@ -20,6 +20,8 @@ import org.apache.hadoop.yarn.webapp.hamlet.Hamlet.P;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.joda.time.LocalTime;  
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+
 
 public class manager {
 
@@ -55,7 +57,7 @@ public class manager {
         job.setMapOutputValueClass(LongPairWritable.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-        // job.setNumReduceTasks(1);
+        job.setNumReduceTasks(1);
         FileInputFormat.addInputPath(job, new Path(input_path));
         String path = output_bucket + job.getJobName();
         FileOutputFormat.setOutputPath(job, new Path(path));
